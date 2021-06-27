@@ -102,15 +102,21 @@ class Woocomerce implements ShouldQueue
             });
 
            foreach ($products as $key => $product) {
-               $wc_product = $this->woocommerce->get('products?sku='.urlencode($product['sku']))[0];
+               $wc_product = $this->woocommerce->get('products?sku='.urlencode($product['sku']));
 
-               try {
-                   $this->woocommerce->put('products/'.$wc_product->id, $product);
-                   Log::info("producto actualizado",["product" => $wc_product->id]);
-               
-               } catch (Exception $e) {
-                   Log::info("fallo del cliente");
+               if (isset($wc_product[0])) {
+                   $wc_product = $wc_product[0];
+
+                   try {
+                       $this->woocommerce->put('products/'.$wc_product->id, $product);
+                       Log::info("producto actualizado",["product" => $wc_product->id]);
+                   
+                   } catch (Exception $e) {
+                       Log::info("fallo del cliente");
+                   }
                }
+
+               
 
 
                

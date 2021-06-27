@@ -35,6 +35,7 @@ class Woocomerce implements ShouldQueue
             'cs_52945752439dc844cdd4a4b0c3e1d252e2757322',
             [
                 'version' => 'wc/v3',
+                'timeout' => 100
             ]
         ); 
 

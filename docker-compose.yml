@@ -1,0 +1,71 @@
+version: "3.3"
+
+services:
+  app:
+    tty: true
+    image: arianvaldivieso/laravel:8.0
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PORT: "${DB_PORT}"
+      VIRTUAL_HOST: "${VIRTUAL_HOST}"
+      LETSENCRYPT_HOST: "${LETSENCRYPT_HOST}"
+      LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
+    depends_on:
+      - db
+    expose:
+      - 8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+    networks:
+      - default
+    links:
+      - db:db
+  
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+       - db:/var/lib/mysql
+       - ./backup-database:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_RANDOM_ROOT_PASSWORD: '0'
+    networks:
+      - default
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - default
+    ports:
+      - 3000:8080
+    environment:
+      VIRTUAL_HOST: "adminer.${VIRTUAL_HOST}"
+      LETSENCRYPT_HOST: "adminer.${LETSENCRYPT_HOST}"
+      LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
+  
+
+
+volumes:
+  html:
+  certs:
+  vhost:
+  static:
+  app:
+  db:
+
+networks:
+  
+  default:
+    driver: bridge

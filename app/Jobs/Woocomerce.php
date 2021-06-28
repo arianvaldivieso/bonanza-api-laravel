@@ -99,6 +99,7 @@ class Woocomerce implements ShouldQueue
                    $wc_product = $wc_product[0];
 
                    try {
+                        Log::info("enviando prodcuto",["product" => $wc_product->id]);
                        $this->woocommerce->put('products/'.$wc_product->id, $product);
                        Log::info("producto actualizado",["product" => $wc_product->id]);
                    

@@ -31,8 +31,8 @@ class Woocomerce implements ShouldQueue
 
         $this->woocommerce = new Client(
             'https://wp-test.mydessk.com', 
-            'ck_68a868735b54e805c43cdbad3fe1ccc8e9412a9d', 
-            'cs_52945752439dc844cdd4a4b0c3e1d252e2757322',
+            'ck_2e24ae3e0ba2768adc7526bd8ee44e510d6b4662', 
+            'cs_d43240bf57e0188c8ed7e7884357abec75f176d0',
             [
                 'version' => 'wc/v3',
                 'timeout' => 100

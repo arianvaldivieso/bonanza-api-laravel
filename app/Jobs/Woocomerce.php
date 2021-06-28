@@ -67,7 +67,7 @@ class Woocomerce implements ShouldQueue
                     
                     'name' => $item['title'],
                     'description' => strip_tags($item['description'],'<ul><li><p><a>'),
-                    'sku' => ($item['sku'] == '') ? $item['title'] : $item['sku'] ,
+                    'sku' => ($item['sku'] == '') ? $item['title'] : $item['sku'].'-'.$item['title'] ,
                     'regular_price' => $item['buyItNowPrice'],
                     'sale_price' => $item['currentPrice'],
                     'manage_stock' => true,
@@ -75,31 +75,22 @@ class Woocomerce implements ShouldQueue
                     'images' => collect($item['pictureURL'])->map(function($image){return ['src' => $image];})->all(),
                 ];
 
-                /**
+               
+               /**
 
                 $data = [
-                    'sku' => ($item['sku'] == '') ? $item['title'] : $item['sku'] ,
+                    'sku' => ($item['sku'] == '') ? $item['title'] : $item['sku'].'-'.$item['title'] ,
                     'post_title' => $item['title'],
-                    'tax:product_cat' => implode('>', explode(' >> ', $item['primaryCategory']['categoryName']))
+                    'tax:product_cat' => implode('>', explode(' >> ', strip_tags($item['primaryCategory']['categoryName'])))
                 ];
 
                 **/
 
-                /**
-
-                if (isset($item['itemSpecifics'])) {
-                    foreach ($item['itemSpecifics'] as $key => $value) {
-                        $data['meta: '.$value['nameValueList']['name']] = $value['nameValueList']['value']; 
-                    }
-                }
-
-                **/
-
-            
-
                 return $data;
 
+
             });
+
 
            foreach ($products as $key => $product) {
                $wc_product = $this->woocommerce->get('products?sku='.urlencode($product['sku']));
@@ -122,41 +113,43 @@ class Woocomerce implements ShouldQueue
                
            }
 
-           /**
+           return true;
 
 
-            $keys = collect([]);
-
-            foreach ($products as $key => $product) {
-                $keys = $keys->concat(array_keys($product));
-            }
-
-            $keys = $keys->unique()->values()->all();
-
-
-            
-
-            $columns = $keys;
-
-            $products = $products->map(function($product) use ($keys){
-                foreach ($keys as $key) {
-                    if (!isset($product[$key])) {
-                        $product[$key] = '';
-                    }
-                }
-
-
-                return $product;
-
-            });
-
-            $fileName = 'products-page-'.$i.'-'.count($products).'.json';
+           $fileName = 'products-page-'.$i.'-'.count($products).'.json';
 
             $fp = fopen($fileName, 'w');
             fwrite($fp, json_encode($products));
             fclose($fp);
 
-            **/
+
+            /**
+
+
+           foreach ($products as $key => $product) {
+               $wc_product = $this->woocommerce->get('products?sku='.urlencode($product['sku']));
+
+               if (isset($wc_product[0])) {
+                   $wc_product = $wc_product[0];
+
+                   try {
+                       $this->woocommerce->put('products/'.$wc_product->id, $product);
+                       Log::info("producto actualizado",["product" => $wc_product->id]);
+                   
+                   } catch (Exception $e) {
+                       Log::info("fallo del cliente");
+                   }
+               }
+
+               
+
+
+               
+           }
+
+           **/
+
+           
 
         }
     }
